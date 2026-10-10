@@ -27,7 +27,15 @@ public final class Overlay {
 
 	private Overlay() {}
 
-	public static void render(GuiGraphicsExtractor g, DeltaTracker delta) {
+	/** HUD layer: only draws while no screen is open (screens draw the overlay themselves, on top). */
+	public static void renderHud(GuiGraphicsExtractor g, DeltaTracker delta) {
+		if (Minecraft.getInstance().screen == null) {
+			render(g);
+		}
+	}
+
+	/** Draws the overlay; called from the HUD and after every screen (inventory, chat, ...). */
+	public static void render(GuiGraphicsExtractor g) {
 		Minecraft mc = Minecraft.getInstance();
 		if (mc.player == null) {
 			return;
