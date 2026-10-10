@@ -11,6 +11,8 @@ import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
+import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
+import net.fabricmc.fabric.api.client.screen.v1.ScreenMouseEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements;
 import net.minecraft.client.KeyMapping;
@@ -36,7 +38,20 @@ public class SkyblockCarrysClient implements ClientModInitializer {
 
 		// Overlay
 		HudElementRegistry.attachElementAfter(VanillaHudElements.CHAT,
-				Identifier.fromNamespaceAndPath(MOD_ID, "overlay"), Overlay::render);
+				Identifier.fromNamespaceAndPath(MOD_ID, "overlay"), Overlay::renderHud);
+
+		// Same overlay on top of every screen (inventory, chat, menus) and clickable there,
+		// so you can press E and click [+] / Yes / No like SkyHanni's overlays.
+		ScreenEvents.AFTER_INIT.register((client, screen, w, h) -> {
+			ScreenEvents.afterExtract(screen).register((s, graphics, mouseX, mouseY, tickProgress) ->
+					Overlay.render(graphics));
+			ScreenMouseEvents.allowMouseClick(screen).register((s, event) -> {
+				if (event.button() == 0 && Overlay.click(event.x(), event.y())) {
+					return false; // we used the click, don't let the screen see it
+				}
+				return true;
+			});
+		});
 
 		// Trade detection
 		ClientReceiveMessageEvents.GAME.register((message, overlay) -> {
