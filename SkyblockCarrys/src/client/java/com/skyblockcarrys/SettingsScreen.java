@@ -15,6 +15,7 @@ public class SettingsScreen extends Screen {
 
 	private int page = 0;
 	private boolean dragging = false;
+	private int dragTarget = 0; // 1 = carry list, 2 = stats text
 	private Button hudButton;
 	private Button chatButton;
 
@@ -144,7 +145,7 @@ public class SettingsScreen extends Screen {
 		graphics.text(this.font, "Price (2m, 500k...)", left + 194, 31, 0xFFAAAAAA, false);
 		int pages = Math.max(1, (CarryConfig.get().bosses.size() + PER_PAGE - 1) / PER_PAGE);
 		graphics.text(this.font, "Page " + (page + 1) + "/" + pages, left + 146, top() + PER_PAGE * 24 + 20, 0xFFAAAAAA, false);
-		String hint = "Tip: drag the overlay anywhere on screen to move it.";
+		String hint = "Tip: drag the carry list and the stats text anywhere on screen to move them.";
 		graphics.text(this.font, hint, (this.width - this.font.width(hint)) / 2, this.height - 14, 0xFF888888, false);
 	}
 
@@ -157,7 +158,8 @@ public class SettingsScreen extends Screen {
 		if (super.mouseClicked(event, doubleClick)) {
 			return true;
 		}
-		if (event.button() == 0 && Overlay.overList(event.x(), event.y())) {
+		if (event.button() == 0 && Overlay.target(event.x(), event.y()) != 0) {
+			dragTarget = Overlay.target(event.x(), event.y());
 			dragging = true;
 			return true;
 		}
@@ -168,8 +170,15 @@ public class SettingsScreen extends Screen {
 	public boolean mouseDragged(MouseButtonEvent event, double dx, double dy) {
 		if (dragging) {
 			CarryConfig cfg = CarryConfig.get();
-			cfg.hudX = Math.max(0, Math.min(this.width - 20, cfg.hudX + (int) Math.round(dx)));
-			cfg.hudY = Math.max(0, Math.min(this.height - 12, cfg.hudY + (int) Math.round(dy)));
+			int nx = (int) Math.round(dx);
+			int ny = (int) Math.round(dy);
+			if (dragTarget == 2) {
+				cfg.statsX = Math.max(0, Math.min(this.width - 20, cfg.statsX + nx));
+				cfg.statsY = Math.max(0, Math.min(this.height - 12, cfg.statsY + ny));
+			} else {
+				cfg.hudX = Math.max(0, Math.min(this.width - 20, cfg.hudX + nx));
+				cfg.hudY = Math.max(0, Math.min(this.height - 12, cfg.hudY + ny));
+			}
 			return true;
 		}
 		return super.mouseDragged(event, dx, dy);

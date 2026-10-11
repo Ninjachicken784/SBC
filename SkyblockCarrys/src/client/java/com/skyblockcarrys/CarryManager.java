@@ -158,10 +158,10 @@ public final class CarryManager {
 		lastBossSec = -1;
 	}
 
-	/** "42s" / "1m05s" / "--" */
+	/** "42s" / "1m05s" / "0s" */
 	public static String lastTimeText() {
 		if (lastBossSec < 0) {
-			return "--";
+			return "0s";
 		}
 		int s = (int) Math.round(lastBossSec);
 		return s < 60 ? s + "s" : (s / 60) + "m" + String.format("%02d", s % 60) + "s";
@@ -170,14 +170,14 @@ public final class CarryManager {
 	/** Bosses per hour from the average of the last few boss times. */
 	public static String perHourText() {
 		if (recent.isEmpty()) {
-			return "--";
+			return "0";
 		}
 		double sum = 0;
 		for (double d : recent) {
 			sum += d;
 		}
 		double avg = sum / recent.size();
-		return avg <= 0 ? "--" : Long.toString(Math.round(3600.0 / avg));
+		return avg <= 0 ? "0" : Long.toString(Math.round(3600.0 / avg));
 	}
 
 	public static void info(String msg) {

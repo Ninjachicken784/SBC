@@ -40,6 +40,9 @@ public final class CarryConfig {
 	public ChatMode chatMode = ChatMode.PARTY;
 	public int hudX = 6;
 	public int hudY = 60;
+	/** position of the "[SBC] Carries / Bosses" stats text */
+	public int statsX = 6;
+	public int statsY = 24;
 	/** Regex used to detect the end of a trade; group 1 = player name. Edit if Hypixel's wording differs. */
 	public String tradeRegex = "(?i)trade completed with (?:\\[[^\\]]+\\]\\s*)?(\\w{1,16})";
 	/** Regex used to read coins out of a chat line shortly after a trade. group 1 = number, group 2 = optional k/m/b. */
