@@ -111,8 +111,15 @@ public class SettingsScreen extends Screen {
 		}).bounds(left + 148, y2 + 24, 140, 20).build();
 		this.addRenderableWidget(chatButton);
 
+		this.addRenderableWidget(Button.builder(Component.literal("Stats: " + (cfg.showStats ? "On" : "Off")), b -> {
+			cfg.showStats = !cfg.showStats;
+			b.setMessage(Component.literal("Stats: " + (cfg.showStats ? "On" : "Off")));
+		}).bounds(left, y2 + 48, 144, 20).build());
+		this.addRenderableWidget(Button.builder(Component.literal("Reset stats"), b -> CarryManager.resetStats())
+				.bounds(left + 148, y2 + 48, 140, 20).build());
+
 		this.addRenderableWidget(Button.builder(Component.literal("Done"), b -> this.onClose())
-				.bounds(this.width / 2 - 50, y2 + 52, 100, 20).build());
+				.bounds(this.width / 2 - 50, y2 + 76, 100, 20).build());
 	}
 
 	private Component hudLabel() {

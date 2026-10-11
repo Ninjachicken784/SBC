@@ -35,6 +35,8 @@ public final class CarryConfig {
 	public String activeBoss = "T4 Eman";
 	/** true = overlay always visible, false = only while someone is being carried */
 	public boolean alwaysShow = true;
+	/** show the "Bosses (42s) 72/h" line in the overlay */
+	public boolean showStats = true;
 	public ChatMode chatMode = ChatMode.PARTY;
 	public int hudX = 6;
 	public int hudY = 60;

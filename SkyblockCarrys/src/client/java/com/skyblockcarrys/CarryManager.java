@@ -3,6 +3,7 @@ package com.skyblockcarrys;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -115,6 +116,7 @@ public final class CarryManager {
 			return;
 		}
 		e.done++;
+		recordBoss();
 		sendProgress(e);
 	}
 
@@ -129,6 +131,53 @@ public final class CarryManager {
 			case PUBLIC -> mc.player.connection.sendChat(text);
 			case LOCAL -> mc.player.sendSystemMessage(Component.literal(text));
 		}
+	}
+
+	// ---- boss timing: time between two [+] clicks ----
+	private static final long MAX_GAP_MS = 5 * 60 * 1000L; // longer pause = break, not a boss time
+	private static final int KEEP = 10;
+	private static final ArrayDeque<Double> recent = new ArrayDeque<>();
+	private static long lastPlusTime = 0;
+	private static double lastBossSec = -1;
+
+	private static void recordBoss() {
+		long now = System.currentTimeMillis();
+		if (lastPlusTime > 0 && now - lastPlusTime <= MAX_GAP_MS) {
+			lastBossSec = (now - lastPlusTime) / 1000.0;
+			recent.addLast(lastBossSec);
+			while (recent.size() > KEEP) {
+				recent.removeFirst();
+			}
+		}
+		lastPlusTime = now;
+	}
+
+	public static void resetStats() {
+		recent.clear();
+		lastPlusTime = 0;
+		lastBossSec = -1;
+	}
+
+	/** "42s" / "1m05s" / "--" */
+	public static String lastTimeText() {
+		if (lastBossSec < 0) {
+			return "--";
+		}
+		int s = (int) Math.round(lastBossSec);
+		return s < 60 ? s + "s" : (s / 60) + "m" + String.format("%02d", s % 60) + "s";
+	}
+
+	/** Bosses per hour from the average of the last few boss times. */
+	public static String perHourText() {
+		if (recent.isEmpty()) {
+			return "--";
+		}
+		double sum = 0;
+		for (double d : recent) {
+			sum += d;
+		}
+		double avg = sum / recent.size();
+		return avg <= 0 ? "--" : Long.toString(Math.round(3600.0 / avg));
 	}
 
 	public static void info(String msg) {

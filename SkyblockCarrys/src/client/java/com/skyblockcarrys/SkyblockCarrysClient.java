@@ -121,6 +121,7 @@ public class SkyblockCarrysClient implements ClientModInitializer {
 						.executes(ctx -> {
 							CarryManager.entries.clear();
 							CarryManager.pending.clear();
+							CarryManager.resetStats();
 							return 1;
 						}));
 	}
